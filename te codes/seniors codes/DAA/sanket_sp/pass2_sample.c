@@ -1,0 +1,210 @@
+#include<stdio.h>
+#include<string.h>
+#include<stdlib.h>
+#include<ctype.h>
+struct symboltable
+{
+	char symbol[8];
+	int  address;
+	int  size;
+}ST[20];
+
+struct intermediatecode
+{
+	int lc;
+	char type1[8],code1[8];
+	char type2[8],code2[8];
+	char type3[8],code3[8];
+}IC[30];
+
+struct Littable
+{
+	char literal[7];
+	int address;
+}LT[10];
+
+struct pooltable
+{
+	int literal_no;
+}PT[10];
+
+int iIC=0;
+char s1[8],s2[8],s3[8],s4[10],s5[8],s6[8],s7[8];
+void init()
+{
+	strcpy(s1,"");
+	strcpy(s2,"");
+	strcpy(s3,"");
+	strcpy(s4,"");
+	strcpy(s5,"");
+	strcpy(s6,"");
+	strcpy(s7,"");
+}
+/*
+void mcode()
+{
+	int i;
+	printf("\nMachine code");
+	for(i=0;i<iIC;i++)
+	{
+		switch(IC[i].type1[0])
+		{
+			case 'D':
+				if(strcmp(IC[i].code1,"01")==0)
+					printf("\n%d) + 00 0 00%s",IC[i].LC,IC[i].code2);
+				break;
+			case 'A':
+				break;
+			case 'I':
+				if(strcmp(IC[i].code1,"00")==0)	//stop
+					printf("\n%d) + 00 0 000",IC[i].LC);
+				else
+				{
+					printf("\n%d) + %s",IC[i].LC,IC[i].code1);
+				if(strcmp(IC[i].type2,"S")!=0) //(strcmp(IC[i].type2,"RG")==0 || strcmp(IC[i].type2,"CC") ==0)
+						printf(" %d",atoi(IC[i].code2));	// for 1st operand register or condition
+					else
+						printf(" 0 %d",ST[atoi(IC[i].code2)].Address);	//for read and print
+						
+					if(strcmp(IC[i].type3,"L")==0)
+						printf(" %d",LIT[atoi(IC[i].code3)].address);
+					else if(strcmp(IC[i].type3,"S")==0)
+						printf(" %d",ST[atoi(IC[i].code3)].Address);
+				}
+				break;
+		}
+	}
+}
+*/
+
+
+
+void mcode()
+{
+	int i;
+	for(i=0;i<iIC;i++)
+	{
+		switch(atoi(IC[i].type1))
+		{
+			case 'D':
+				if(strcmp(IC[i].code1,"01") == 0)            // DS statement
+					printf("\n %d) + 00 0 00%s",IC[i].lc,IC[i].code2);
+					break;
+					
+					
+			case 'A':
+				break;
+				
+				
+			case 'I':
+				if(strcmp(IC[i].code1,"00")==0)
+				{
+					printf("\n %d) + 00 0 000",IC[i].lc);
+				}
+				else
+				{
+					printf("\n %d) + %s",IC[i].lc,IC[i].code1);
+					if(strcmp(IC[i].type2,"S")!=0)
+					{
+						printf(" %d",atoi(IC[i].code2));
+					}
+					
+					else
+					{
+						printf(" %d",ST[atoi(IC[i].code2)].address);
+					}
+					
+					if(strcmp(IC[i].type3,"L")==0)
+					{
+						printf(" %d",LT[atoi(IC[i].code3)].address);
+					}
+					
+					else if(strcmp(IC[i].type3,"S")==0)
+					{
+						printf(" %d",ST[atoi(IC[i].code3)].address);
+					}
+				}
+			break;
+					
+		}
+	}
+}
+
+
+
+int main()
+{
+	int i,j=0,count;
+	char nextline[80];
+	FILE *fp;
+	fp=fopen("literal.txt","r");
+	j=0;
+	printf("Literal table\n");
+	while(fscanf(fp,"%s%s",s1,s2)!=-1)
+	{
+		strcpy(LT[j].literal,s1);
+		LT[j].address=atoi(s2);
+		printf("%s %d\n",LT[j].literal,LT[j].address);
+		j++;
+	}
+	fclose(fp);
+
+	fp=fopen("pooltable.txt","r");
+	j=0;
+	printf("\nPool table\n");
+	while(fscanf(fp,"%s",s1)!=-1)
+	{
+		PT[j].literal_no=atoi(s1);
+		printf("%d\n",PT[j].literal_no);
+		j++;
+	}
+	fclose(fp);
+
+	fp=fopen("symbol.txt","r");
+	j=0;
+	printf("\nSymbol table\n");
+	while(fscanf(fp,"%s%s%s",s1,s2,s3)!=-1)
+	{
+		strcpy(ST[j].symbol,s1);
+		ST[j].address=atoi(s2);
+		ST[j].size=atoi(s3);
+		printf("%s %d %d\n",ST[j].symbol,ST[j].address,ST[j].size);
+		j++;
+	}
+	fclose(fp);
+
+	fp=fopen("ic.txt","r");
+	j=0;
+	printf("\nIntermediate code\n");
+	while(!feof(fp))
+	{
+		i=0;
+		nextline[i]=fgetc(fp);
+		while(nextline[i]!='\n'&& nextline[i]!=EOF )
+		{
+			if(!isalnum(nextline[i]))
+				nextline[i]=' ';
+			i++;
+			nextline[i]=fgetc(fp);
+		}
+		nextline[i]='\0';
+		init();
+		count=sscanf(nextline,"%s%s%s%s%s%s%s",s1,s2,s3,s4,s5,s6,s7);
+		if(count==-1)
+			continue;
+		IC[j].lc=atoi(s1);
+		strcpy(IC[j].type1,s2);
+		strcpy(IC[j].code1,s3);
+		strcpy(IC[j].type2,s4);
+		strcpy(IC[j].code2,s5);
+		strcpy(IC[j].type3,s6);
+		strcpy(IC[j].code3,s7);
+		printf("%d %s %s %s %s %s %s\n",IC[j].lc,IC[j].type1,IC[j].code1,IC[j].type2,IC[j].code2,IC[j].type3,IC[j].code3);
+		j++;
+	}
+	iIC=j;
+	fclose(fp);
+	mcode();
+	printf("\n");
+	return 0;
+}

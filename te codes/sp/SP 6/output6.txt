@@ -1,0 +1,39 @@
+/******************************************************************************************************************************************
+						OUTPUT: Calculator using LEX and YACC
+******************************************************************************************************************************************/
+
+hadoop1@kara-VirtualBox:~$ cd Desktop
+hadoop1@kara-VirtualBox:~/Desktop$ flex calc.l
+hadoop1@kara-VirtualBox:~/Desktop$ yacc -d calc.y
+hadoop1@kara-VirtualBox:~/Desktop$ gcc y.tab.c lex.yy.c
+y.tab.c: In function ‘yyparse’:
+y.tab.c:1145:16: warning: implicit declaration of function ‘yylex’ [-Wimplicit-function-declaration]
+       yychar = yylex ();
+                ^~~~~
+y.tab.c:1395:7: warning: implicit declaration of function ‘yyerror’; did you mean ‘yyerrok’? [-Wimplicit-function-declaration]
+       yyerror (YY_("syntax error"));
+       ^~~~~~~
+       yyerrok
+calc.y: At top level:
+calc.y:111:1: warning: return type defaults to ‘int’ [-Wimplicit-int]
+ main()
+ ^~~~
+calc.y:116:1: warning: return type defaults to ‘int’ [-Wimplicit-int]
+ yyerror(s)
+ ^~~~~~~
+calc.y:122:1: warning: return type defaults to ‘int’ [-Wimplicit-int]
+ yywrap()
+ ^~~~~~
+hadoop1@kara-VirtualBox:~/Desktop$ ./a.out
+4+5 
+9
+10-4
+6
+10*2
+20
+10/5
+2
+(10/2)+4*2
+13
+
+

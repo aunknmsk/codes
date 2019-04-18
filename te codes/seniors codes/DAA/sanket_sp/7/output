@@ -1,0 +1,20 @@
+[sanket@localhost lex]$ flex while.l
+[sanket@localhost lex]$ bison while.y
+[sanket@localhost lex]$ gcc -o t while.tab.c -ll -ly
+[sanket@localhost lex]$ ./t
+
+Enter the expression : while(k=8) k=a*b+2;
+L1: 
+k = 8
+t0 = not k
+if t0 goto L0
+t1 = a * b
+t2 = t1 + 2
+k = t2
+goto L1 
+L0: 
+[sanket@localhost lex]$ 
+
+
+
+
